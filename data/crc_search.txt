@@ -1,0 +1,6 @@
+// par_name, par_node, par_child_node
+NAME, div#crcPDPComponentDescription, h2
+SIZES, ul.crcPDPList, li:contains(Size)
+DISCOUNT, div.discount-save*, span.value
+PRICE, div.crcPDPPriceCurrent, *
+MSRP, div.discount-rrp*, span.value

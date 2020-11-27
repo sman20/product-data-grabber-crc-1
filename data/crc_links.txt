@@ -1,0 +1,8 @@
+// types of sizes: Size ShoesSize ClothingSize WheelSize Length Diameter (like pars.cfg)
+// product_name, key_size_type, url_link_BE_EUR_ENG
+Tire Schwalbe Marathon Supreme Touring MTB, WheelSize, https://www.chainreactioncycles.com/be/en/schwalbe-marathon-supreme-touring-mtb-tyre/rp-prod143816
+Brake Shimano SLX M7000, Length, https://www.chainreactioncycles.com/be/en/shimano-slx-m7000-disc-brake/rp-prod148226
+Rotor Shimano SLX RT70 M7000 Centre Lock, Diameter, https://www.chainreactioncycles.com/be/en/shimano-slx-rt70-m7000-centre-lock-disc-rotor/rp-prod148231
+Helmet IXS Trail EVO, ClothingSize, https://www.chainreactioncycles.com/be/en/ixs-trail-evo-helmet/rp-prod154019
+Shoes Five Ten Sleuth (2020) 2020, ShoesSize, https://www.chainreactioncycles.com/be/en/five-ten-sleuth-mtb-shoes-2020-2020/rp-prod194525
+Lube Squirt Chain 500ml, Size, https://www.chainreactioncycles.com/be/en/squirt-chain-lube-500ml/rp-prod167388

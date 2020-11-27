@@ -1,0 +1,8 @@
+// rows in order: Size ShoesSize ClothingSize WheelSize Length Diameter (like pars.cfg)
+"skuId"
+"EU 42", "US 8.5", "UK 8"
+"L", "M/L"
+"29\""
+"1800mm"
+"160mm", "180mm"
+
