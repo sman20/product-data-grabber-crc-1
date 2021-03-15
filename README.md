@@ -67,7 +67,11 @@ First release of Product Data Grabber Crc1.
         <li>Product common parameters - <code>[data/crc_search.cfg]</code> - with common parameters you are interested in <i>(most likely NOT required)</i></li>
     </ul>
  </li>
- <li>Run the app on a machine connected to the Internet and choose options you want from the menu (see the list on the top).</li>
+ <li>If you updated any <code>[data/crc_*.cfg]</code> file, delete binary files - <code>[data/crc_*.dat]</code> - with old configuration</li>
+ <li>Run the app on a machine connected to the Internet</li>
+ <li>Verify data that is currently used by the app with option [0] of the menu</li>
+ <li>Choose options you want from the menu (see the complete list on the top)</li>
+ <li>If exit with option [9] of the menu, current configuration will be stored in binary files - <code>[data/crc_*.dat]</code> - and used next time</li>
  </ol>
  <p>
  @author S.V.
