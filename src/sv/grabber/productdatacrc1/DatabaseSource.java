@@ -4,35 +4,38 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * Implementation of all necessary methods to interact with SQLite database.
  */
 public class DatabaseSource {
 
-    public static final String DB_NAME = "crc.db";
-    public static final String CONNECTION_STRING = "jdbc:sqlite:db\\" + DB_NAME;
+    private static final String DB_NAME = "crc.db";
+    static final String CONNECTION_STRING = "jdbc:sqlite:db\\" + DB_NAME;
 
-    public static final DatabaseTable PRODUCTS_TABLE = new DatabaseTable("products",
-            new String[] {"name", "keysize", "width", "size", "msrp", "color", "skuid"});
-    public static final DatabaseTable PRODUCT_STATS_TABLE = new DatabaseTable("product_data",
-            new String[] {"date", "discount", "price", "inventory", "available", "skuid"});
+    // "name", "date", "save", "price", "inventory", "available", "keysize", "width", "size", "msrp", "color", "skuid"
+    //  0       1       2       3        4              5           6           7       8       9       10      11
+    static final DatabaseTable PRODUCTS_TABLE = new DatabaseTable("products",
+            new String[] {"name", "keysize", "width", "size", "msrp", "color", "skuid"});           // 0 6 7 8 9 10 11
+    static final DatabaseTable PRODUCT_STATS_TABLE = new DatabaseTable("product_data",
+            new String[] {"date", "discount", "price", "inventory", "available", "skuid"});             // 1 2 3 4 5 11
 
-    public static final String QUERY_DROP = "DROP TABLE IF EXISTS ";
+    private static final String QUERY_DROP = "DROP TABLE IF EXISTS ";
 
-    public static final String COLUMN_TXT = "TEXT";
+    private static final String COLUMN_TXT = "TEXT";
 
     private Connection dbConnection;
     private PreparedStatement updateQuery;
     private ResultSet queryResults;
 
-    protected void dropTable(Connection dbConnection, DatabaseTable table) {
+    void dropTable(Connection dbConnection, DatabaseTable table) {
         executeUpdateQuery(dbConnection, QUERY_DROP + table.getName());
     }
-    protected void createNewTable(Connection dbConnection, DatabaseTable table) {
+    void createNewTable(Connection dbConnection, DatabaseTable table) {
         executeUpdateQuery(dbConnection, buildCreateTableQuery(table.getColumnNames(), COLUMN_TXT, table.getName()));
     }
-    protected void insertNewData(Connection dbConnection, DatabaseTable table, String[] productData) {
+    void insertNewData(Connection dbConnection, DatabaseTable table, String[] productData) {
         if (productData.length != table.getColumnNames().length) {        // table fit check
             System.out.println("ERROR Expected " + table.getColumnNames().length + "data items but provided " + productData.length);
             return;
@@ -40,24 +43,22 @@ public class DatabaseSource {
         executeUpdateQueryPrep(dbConnection, buildInsertNewProductPrepQuery(table, productData.length), productData);
     }
 
-    protected boolean isProductPresent(Connection dbConnection, String productSkuId) {
+    boolean isProductPresent(Connection dbConnection, String productSkuId) {
         // SELECT COUNT(*) FROM <tableName> WHERE skuid = <value>
         List<StringBuilder> queryOutputList = executeQueryPrep(dbConnection,
                 "SELECT COUNT(*) FROM " + PRODUCTS_TABLE.getName() + " WHERE skuid = ?", new String[]{productSkuId}, "");
-        assert queryOutputList != null;
         return isNotZero(queryOutputList);
     }
 
-    protected boolean isProductDataPresent(Connection dbConnection, String productSkuId, String date) {
+    boolean isProductDataPresent(Connection dbConnection, String productSkuId, String date) {
         // SELECT COUNT(*) FROM <tableName> WHERE skuid = ? AND date = ?
         List<StringBuilder> queryOutputList = executeQueryPrep(dbConnection,
                 "SELECT COUNT(*) FROM " + PRODUCT_STATS_TABLE.getName() + " WHERE skuid = ? AND date = ?", new String[]{productSkuId, date}, "");
-        assert queryOutputList != null;
         return isNotZero(queryOutputList);
     }
 
     private boolean isNotZero(List<StringBuilder> queryOutputList) {
-        String queryOutput = queryOutputList.toString();
+        String queryOutput = queryOutputList != null ? queryOutputList.toString() : "";
         String expectedZero = "[0]";
         String expectedOne = "[1]";
         if (queryOutput.equals(expectedZero)) {
@@ -68,39 +69,130 @@ public class DatabaseSource {
         return true;
     }
 
-    public void printAllProductData(String separator) {
-        for (StringBuilder skuid : getColumnDataList(dbConnection, "skuid", PRODUCTS_TABLE.getName())) {
-            System.out.println("_____________________________");
-            System.out.println(getProductInfoForSkuid(dbConnection, PRODUCTS_TABLE.getName(), skuid.toString(), separator));
-            System.out.println(getProductInfoForSkuid(dbConnection, PRODUCT_STATS_TABLE.getName(), skuid.toString(), separator));
+    void printDataOfParticularProduct(String productSkuid, String separator) {
+        System.out.println("_____________________________");
+        System.out.println(getProductInfoBySkuid(dbConnection, PRODUCTS_TABLE.getName(), productSkuid, separator));
+        System.out.println(getProductInfoBySkuid(dbConnection, PRODUCT_STATS_TABLE.getName(), productSkuid, separator));
+    }
+
+    void printDataOfNamedAlikeProducts(String productParValue, String separator) {
+        System.out.println("________ [" + productParValue + "] products data from the DB ________");
+        String columnName = "name";
+        for (StringBuilder name : getColumnDataList(dbConnection, columnName, PRODUCTS_TABLE.getName())) {
+            if (name.toString().contains(productParValue)) {
+                printDataOfParticularProduct(getProductSkuidByName(dbConnection, columnName, name.toString(), separator), separator);
+            }
         }
     }
 
-    protected List<StringBuilder> getColumnDataList(Connection dbConnection, String columnName, String tableName) {
+    void printAllProductData(String title, String separator) {
+        System.out.println("________ " + title + " product data from the DB ________");
+        for (StringBuilder skuid : getColumnDataList(dbConnection, "skuid", PRODUCTS_TABLE.getName())) {
+            printDataOfParticularProduct(skuid.toString(), separator);
+        }
+    }
+
+    void printChangedProductData(String title, BiFunction<List<StringBuilder>, String, StringBuilder> returnTwoLines, String separator) {
+        System.out.println("________ " + title + " product data from the DB ________");
+        for (StringBuilder skuid : getColumnDataList(dbConnection, "skuid", PRODUCTS_TABLE.getName())) {
+            String foundRecords = getChangedProductInfoForSkuid(dbConnection, PRODUCT_STATS_TABLE.getName(), skuid.toString(), separator, returnTwoLines);
+            if (!foundRecords.equals("")) {
+                System.out.println("_____________________________");
+                System.out.println(getProductInfoBySkuid(dbConnection, PRODUCTS_TABLE.getName(), skuid.toString(), separator));
+                System.out.println(foundRecords);
+            }
+        }
+    }
+
+    List<StringBuilder> getColumnDataList(Connection dbConnection, String columnName, String tableName) {
 //         SELECT <columnName> FROM <tableName>
         List<StringBuilder> skuidList = executeQuery(dbConnection, "SELECT " + columnName + " FROM " + tableName);
-        if (skuidList == null || skuidList.get(0).toString().equals("")) {
+        if (isListNullOrEmpty(skuidList)) {
             System.out.println("No product in the DB yet.");
         }
         return skuidList;
     }
 
-    protected String getProductInfoForSkuid(Connection dbConnection, String tableName, String skuid, String separator) {
+    String getProductInfoBySkuid(Connection dbConnection, String tableName, String parValue, String separator) {
+        return getProductInfoByValue(dbConnection, tableName, "skuid", parValue, separator);
+    }
+
+    String getProductSkuidByName(Connection dbConnection, String columnName, String parValue, String separator) {
+        String productDetails = getProductInfoByValue(dbConnection, PRODUCTS_TABLE.getName(), columnName, parValue, separator);
+        return productDetails.substring(productDetails.lastIndexOf(separator) + 1);
+    }
+
+    private String getProductInfoByValue(Connection dbConnection, String tableName, String columnName, String value, String separator) {
+        // SELECT * FROM <tableName> WHERE <columnName> = ?
+        List<StringBuilder> dataList = executeQueryPrep(dbConnection,
+                "SELECT * FROM " + tableName + " WHERE " + columnName + " = ?", new String[]{value}, separator);
+        StringBuilder formattedData = new StringBuilder();
+        if (!isListNullOrEmpty(dataList)) {
+            for (StringBuilder dataLine : dataList) {
+                formattedData.append(dataLine);
+                boolean isLastDataLine = !dataLine.toString().equals(dataList.get(dataList.size() - 1).toString());
+                if (isLastDataLine) {
+                    formattedData.append("\n\r");
+                }
+            }
+        } else {
+            formattedData.append("No data for ").append(value).append(" in ").append(tableName).append(" of the DB yet.");
+        }
+        return formattedData.toString();
+    }
+
+    String getChangedProductInfoForSkuid(Connection dbConnection, String tableName, String skuid, String separator, BiFunction<List<StringBuilder>, String, StringBuilder> returnTwoLines) {
         // SELECT * FROM <tableName> WHERE skuid = ?
         List<StringBuilder> dataList = executeQueryPrep(dbConnection,
                 "SELECT * FROM " + tableName + " WHERE skuid = ?", new String[]{skuid}, separator);
         StringBuilder formattedData = new StringBuilder();
-        if (dataList != null && !dataList.get(0).toString().equals("")) {
-            for (StringBuilder dataLine : dataList) {
-                formattedData.append(dataLine);
-                if (!dataLine.toString().equals(dataList.get(dataList.size() - 1).toString())) {
-                    formattedData.append("\n\r");
-                }
+        if (!isListNullOrEmpty(dataList)) {
+            if (dataList.size() > 1) {
+                formattedData = returnTwoLines.apply(dataList, separator);
             }
         } else {
             formattedData.append("No data for ").append(skuid).append(" in ").append(tableName).append(" of the DB yet.");
         }
         return formattedData.toString();
+    }
+
+    StringBuilder getLastTwoDifferentLinesIfExist(List<StringBuilder> dataList, String separator) {
+        StringBuilder lastTwoLinesBuilder = new StringBuilder();
+        StringBuilder lastLineBuilder = dataList.get(dataList.size() - 1);
+        String lastLine = getStringWithoutFirstItem(lastLineBuilder, separator);
+        StringBuilder prevDifferentLineBuilder = new StringBuilder();
+        for (int i = dataList.size() - 2; i > -1; i--) {
+            StringBuilder currLineBuilder = dataList.get(i);
+            String currLine = getStringWithoutFirstItem(currLineBuilder, separator);
+            if (!currLine.equals(lastLine)) {
+                prevDifferentLineBuilder = currLineBuilder;
+                break;
+            }
+        }
+        if (!prevDifferentLineBuilder.toString().equals("")) {
+            lastTwoLinesBuilder.append(prevDifferentLineBuilder).append("\n\r").append(lastLineBuilder);
+        }
+        return lastTwoLinesBuilder;
+    }
+
+    private boolean isListNullOrEmpty(List<StringBuilder> list) {
+        return (list == null) || Arrays.toString(list.toArray()).equals("[]") || list.get(0).toString().equals("");
+    }
+
+    StringBuilder getLastTwoLinesIfDifferent(List<StringBuilder> dataList, String separator) {
+        StringBuilder lastTwoLinesBuilder = new StringBuilder();
+        StringBuilder lastLineBuilder = dataList.get(dataList.size() - 1);
+        String lastLine = getStringWithoutFirstItem(lastLineBuilder, separator);
+        StringBuilder prevLineBuilder = dataList.get(dataList.size() - 2);
+        String prevLine = getStringWithoutFirstItem(prevLineBuilder, separator);
+        if (!prevLine.equals(lastLine)) {
+            lastTwoLinesBuilder.append(prevLineBuilder).append("\n\r").append(lastLineBuilder);
+        }
+        return lastTwoLinesBuilder;
+    }
+
+    private String getStringWithoutFirstItem (StringBuilder strBuilder, String separator) {
+        return strBuilder.substring(strBuilder.indexOf(separator) + 1);
     }
 
     private String buildCreateTableQuery(String[] colNames, String colType, String tableName) {
@@ -170,7 +262,7 @@ public class DatabaseSource {
     }
 
     private void executeUpdateQuery(Connection dbConnection, String sqlQuery) {
-        try {
+        try {       // NOTE 2 statements below in separate try-catch blocks cause "[SQLITE_BUSY]  The database file is locked (database is locked)"
             if (sqlQuery.contains("?")) {
                 System.out.println("ERROR Expected non-PreparedStatement but provided: " + sqlQuery);
                 return;
@@ -186,7 +278,6 @@ public class DatabaseSource {
     private void finalizePrepStatement(Connection dbConnection, String query, String[] pars) throws SQLException {
         updateQuery = dbConnection.prepareStatement(query);
         for (int i = 0; i < pars.length; i++) {
-            // NOTE single quotes should be removed if present to avoid storing them as part of the value in the DB
             updateQuery.setString(i + 1, pars[i].replace("'", ""));
         }
     }
@@ -215,7 +306,7 @@ public class DatabaseSource {
         return false;
     }
 
-    protected Connection open(String connectionString) {
+    Connection open(String connectionString) {
         try {
             dbConnection = DriverManager.getConnection(connectionString);
         } catch (SQLException e) {
@@ -224,7 +315,7 @@ public class DatabaseSource {
         }
         return dbConnection;
     }
-    protected void close() {
+    void close() {
         try {
             if (queryResults != null) queryResults.close();
             if (updateQuery != null) updateQuery.close();

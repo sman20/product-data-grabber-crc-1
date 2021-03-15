@@ -1,17 +1,14 @@
 package sv.grabber.productdatacrc1;
 
 import org.junit.jupiter.api.*;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.MethodOrderer.*;
 
-@TestMethodOrder(OrderAnnotation.class)
-class DatabaseSourceTest {
+class DatabaseSourceTest {      // NOTE, successfully run tests are logging purely for demonstration and tracing purposes
     public static final String TEST_DB_NAME = "test.db";
     public static final String TEST_CONNECTION_STRING = "jdbc:sqlite:db\\" + TEST_DB_NAME;
 
@@ -21,63 +18,51 @@ class DatabaseSourceTest {
             new String[] {"t_date", "t_discount", "t_price", "t_inventory", "t_available", "t_skuid"});             // 1 2 3 4 5 11
 
     public static final String[][] TEST_PRODUCTS = new String[][]{
-                    {"'Product 1 Wrench'", "'One Size'", "''", "'One Size'", "'€11'", "'Black'", "'sku000001'"},
-                    {"'Product 2 Shoes'", "'US 7.5'", "''", "''", "'€22'", "'Silver'", "'sku000002'"},
-                    {"'Product 3 Shorts'", "'M'", "''", "''", "'€33'", "'Bronze'", "'sku000003'"},
-                    {"'Product 4 Tire'", "'26\"'", "'2.10'", "'Folding Bead'", "'€44'", "'Black - Reflective'", "'sku000004'"}};
+            {"'Product 1 Wrench'", "'One Size'", "''", "'One Size'", "'€11'", "'Black'", "'sku000001'"},
+            {"'Product 2 Shoes'", "'US 7.5'", "''", "''", "'€22'", "'Silver'", "'sku000002'"},
+            {"'Product 3 Shorts'", "'M'", "''", "''", "'€33'", "'Bronze'", "'sku000003'"},
+            {"'Product 4 Tire'", "'26\"'", "'2.10'", "'Folding Bead'", "'€44'", "'Black - Reflective'", "'sku000004'"}};
     public static final String[] TMP_TEST_PRODUCT = new String[]{"'Product TMP Lube'", "'100ml'", "''", "'100ml'", "'€99'", "''", "'sku100000'"};
 
     public static final String[][] TEST_PRODUCT_1_DATA = new String[][]{
-                                        {"'20200101'", "'10%'", "'€10'", "'IN STOCK (11+)'", "'true'", "'sku000001'"},
-                                        {"'20200102'", "'10%'", "'€10'", "'Out of stock'", "'false'", "'sku000001'"}};
+            {"'20200101'", "'10%'", "'€10'", "'IN STOCK (11+)'", "'true'", "'sku000001'"},
+            {"'20200102'", "'10%'", "'€10'", "'Out of stock'", "'false'", "'sku000001'"}};
     public static final String[][] TEST_PRODUCT_2_DATA = new String[][]{
-                                        {"'20200101'", "'20%'", "'€20'", "'IN STOCK (22+)'", "'true'", "'sku000002'"},
-                                        {"'20200102'", "'20%'", "'€20'", "'Only (2) left'", "'true'", "'sku000002'"}};
+            {"'20200101'", "'20%'", "'€20'", "'IN STOCK (22+)'", "'true'", "'sku000002'"},
+            {"'20200102'", "'20%'", "'€20'", "'Only (2) left'", "'true'", "'sku000002'"}};
     public static final String[][] TEST_PRODUCT_3_DATA = new String[][]{
-                                        {"'20200101'", "'30%'", "'€30'", "'IN STOCK (33+)'", "'true'", "'sku000003'"},
-                                        {"'20200102'", "'30%'", "'€30'", "'Only (3) left'", "'true'", "'sku000003'"}};
+            {"'20200101'", "'30%'", "'€30'", "'IN STOCK (33+)'", "'true'", "'sku000003'"},
+            {"'20200102'", "'30%'", "'€30'", "'Only (3) left'", "'true'", "'sku000003'"}};
     public static final String[][] TEST_PRODUCT_4_DATA = new String[][]{
-                                        {"'20200101'", "'40%'", "'€40'", "'IN STOCK (44+)'", "'true'", "'sku000004'"},
-                                        {"'20200102'", "'40%'", "'€40'", "'Only (4) left'", "'true'", "'sku000004'"}};
+            {"'20200101'", "'40%'", "'€40'", "'IN STOCK (44+)'", "'true'", "'sku000004'"},
+            {"'20200102'", "'40%'", "'€40'", "'Only (4) left'", "'true'", "'sku000004'"}};
     public static final String[][] TMP_TEST_PRODUCT_DATA = new String[][]{
-                                {"'20201111'", "'99%'", "'€99'", "'IN STOCK (99++)'", "'true'", "'sku000004'"},
-                                {"'20200101'", "'99%'", "'€99'", "'IN STOCK (99++)'", "'true'", "'sku400000'"},
-                                {"'20201111'", "'99%'", "'€99'", "'IN STOCK (99++)'", "'true'", "'sku400000'"}};
+            {"'20201111'", "'99%'", "'€99'", "'IN STOCK (99++)'", "'true'", "'sku000004'"},
+            {"'20200101'", "'99%'", "'€99'", "'IN STOCK (99++)'", "'true'", "'sku400000'"},
+            {"'20201111'", "'99%'", "'€99'", "'IN STOCK (99++)'", "'true'", "'sku400000'"}};
     public static final String[][][] TEST_PRODUCT_DATA_MATRIX = new String[][][]{TEST_PRODUCT_1_DATA,
-                                                                                TEST_PRODUCT_2_DATA,
-                                                                                TEST_PRODUCT_3_DATA,
-                                                                                TEST_PRODUCT_4_DATA};
+            TEST_PRODUCT_2_DATA,
+            TEST_PRODUCT_3_DATA,
+            TEST_PRODUCT_4_DATA};
 
-    private DatabaseSource testDbSource;
-    private Connection testDbConnection;
+    private static DatabaseSource testDbSource;
+    private static Connection testDbConnection;
 
     @BeforeAll
     static void beforeSuit() throws SQLException {
         System.out.println("TEST: Starting " + DatabaseSourceTest.class.getSimpleName() + " test set...");
-//        prepareTestDb();              // to prepare and fulfill test DB with test data initially
-    }
-
-    @AfterAll
-    static void afterSuit() {
-        System.out.print("TEST: The " + DatabaseSourceTest.class.getSimpleName() + " test set finished.");
-    }
-
-    @BeforeEach
-    void setUp() throws SQLException {
-        System.out.println("TEST: Starting new test...");
+//        prepareTestDb();              // to use when need to prepare and fulfill test DB with test data initially
         testDbSource = new DatabaseSource();
         testDbConnection = DriverManager.getConnection(TEST_CONNECTION_STRING);
     }
 
-    @AfterEach
-    void tearDown() throws SQLException {
+    @AfterAll
+    static void afterSuit() throws SQLException {
         if (testDbConnection != null) testDbConnection.close();
         if (testDbSource != null) testDbSource.close();
-        System.out.print("TEST: The test finished and DB connection closed.");
+        System.out.print("TEST: The " + DatabaseSourceTest.class.getSimpleName() + " test set finished.");
     }
 
-//    @Disabled
-    @Order(3)
     @Test
     void createAndDropNewTable() throws SQLException {
         System.out.println("_______  TEST: " + new Object(){}.getClass().getEnclosingMethod().getName() + "  _______");
@@ -100,7 +85,7 @@ class DatabaseSourceTest {
             try {
                 System.out.print("TEST: Checking the new table dropped...");
                 selectColumnsFromTable(testDbConnection, TEST_PRODUCTS_TABLE);
-                fail("TEST: No java.sql.SQLException thrown ! The table should not exist !");
+                fail("TEST: No expected java.sql.SQLException thrown ! The table exists but should not !");
             } catch (SQLException droppedEx) {
                 assertTrue(droppedEx.toString().contains("SQL error or missing database (no such table:"));
                 System.out.println("\tPASSED");
@@ -108,12 +93,10 @@ class DatabaseSourceTest {
         }
     }
 
-//    @Disabled
-    @Order(3)
     @Test
     void insertNewData() throws SQLException {
         System.out.println("_______  TEST: " + new Object(){}.getClass().getEnclosingMethod().getName() + "  _______");
-        int newProductNmb = (int) (Math.random() * TEST_PRODUCTS.length);       // randomly choosing data set
+        int newProductNmb = (int) (Math.random() * TEST_PRODUCTS.length);
         try {
             testDbConnection.setAutoCommit(false);          // transaction start
             System.out.println("TEST: Counting a product to add qty...");
@@ -129,12 +112,10 @@ class DatabaseSourceTest {
             System.out.println("TEST: ERROR getting int from countAllFromWhere - " + nEx);
             throw nEx;
         } finally {
-            testDbConnection.rollback();                // transaction finish
+            testDbConnection.rollback();
         }
     }
 
-//    @Disabled
-//    @Order(3)
     @Test
     void isProductPresent() throws SQLException {
         System.out.println("_______  TEST: " + new Object(){}.getClass().getEnclosingMethod().getName() + "  _______");
@@ -152,8 +133,6 @@ class DatabaseSourceTest {
         System.out.println("\tPASSED");
     }
 
-//    @Disabled
-//    @Order(3)
     @Test
     void isProductDataPresent() throws SQLException {
         System.out.println("_______  TEST: " + new Object(){}.getClass().getEnclosingMethod().getName() + "  _______");
@@ -175,8 +154,6 @@ class DatabaseSourceTest {
         System.out.println("\tPASSED");
     }
 
-//    @Disabled
-    @Order(3)
     @Test
     void getColumnData() {
         System.out.println("_______  TEST: " + new Object(){}.getClass().getEnclosingMethod().getName() + "  _______");
@@ -192,8 +169,6 @@ class DatabaseSourceTest {
         System.out.println("\tPASSED");
     }
 
-//    @Disabled
-    @Order(3)
     @Test
     void getProductInfo() {
         System.out.println("_______  TEST: " + new Object(){}.getClass().getEnclosingMethod().getName() + "  _______");
@@ -205,24 +180,25 @@ class DatabaseSourceTest {
             prodInfoBuilderExpected.append(TEST_PRODUCTS[testProdNmb][i].replace("'", ""));
             if (i < TEST_PRODUCTS[testProdNmb].length - 1) prodInfoBuilderExpected.append(separator);
         }
-        String prodInfoActual = testDbSource.getProductInfoForSkuid(testDbConnection, DatabaseSource.PRODUCTS_TABLE.getName(), TEST_PRODUCTS[testProdNmb][TEST_PRODUCTS[testProdNmb].length - 1], separator);
+        String prodInfoActual = testDbSource.getProductInfoBySkuid(testDbConnection,
+                DatabaseSource.PRODUCTS_TABLE.getName(),
+                TEST_PRODUCTS[testProdNmb][TEST_PRODUCTS[testProdNmb].length - 1],  // skuid value
+                separator);
         assertEquals(prodInfoBuilderExpected.toString(), prodInfoActual);
         System.out.println("\tPASSED");
     }
 
-//    @Disabled
-    @Order(3)
     @Test
     void getProductData() {
         System.out.println("_______  TEST: " + new Object(){}.getClass().getEnclosingMethod().getName() + "  _______");
-        int testProdNmb = (int) (Math.random() * TEST_PRODUCTS.length);     // randomly choosing data set
+        int testProdNmb = (int) (Math.random() * TEST_PRODUCTS.length);     // randomly choosing product
         System.out.print("TEST: Checking that collected product ["+ testProdNmb + "] data retrieved correctly...");
         String separator = "|";
         StringBuilder prodDataBuilderExpected = getCollectedProductData(TEST_PRODUCT_DATA_MATRIX[testProdNmb], separator);
-        String prodDataActual = testDbSource.getProductInfoForSkuid(testDbConnection,
-                                                                DatabaseSource.PRODUCT_STATS_TABLE.getName(),
-                                                                TEST_PRODUCTS[testProdNmb][TEST_PRODUCTS[testProdNmb].length - 1],
-                                                                separator);
+        String prodDataActual = testDbSource.getProductInfoBySkuid(testDbConnection,
+                DatabaseSource.PRODUCT_STATS_TABLE.getName(),
+                TEST_PRODUCTS[testProdNmb][TEST_PRODUCTS[testProdNmb].length - 1],  // skuid value
+                separator);
         assertEquals(prodDataBuilderExpected.toString(), prodDataActual);
         System.out.println("\tPASSED");
     }
@@ -238,14 +214,11 @@ class DatabaseSourceTest {
         return prodDataBuilderExpected;
     }
 
-    @Order(3)
     @Test
-    void openAndClose() throws SQLException {
+    void openAndClose() {
         System.out.println("_______  TEST: " + new Object(){}.getClass().getEnclosingMethod().getName() + "  _______");
         DatabaseSource tDbSource = new DatabaseSource();
-        Connection tDbConnection = null;
-        try {
-            tDbConnection = tDbSource.open(TEST_CONNECTION_STRING);
+        try (Connection tDbConnection = tDbSource.open(TEST_CONNECTION_STRING)) {
             System.out.print("TEST: Checking connection to the DB...");
             assertNotNull(tDbConnection);
             System.out.println("\tPASSED");
@@ -258,12 +231,11 @@ class DatabaseSourceTest {
             assertTrue(e.toString().contains("database connection closed"));
             System.out.println("\tPASSED");
         } finally {
-            if (tDbConnection != null) tDbConnection.close();
             if (tDbSource != null) tDbSource.close();
         }
     }
 
-    private static String formStringForSql(String[] strings, String type, String separator) {
+    private static String formStringForSql(String[] strings, String type) {
         StringBuilder concatenatedString = new StringBuilder("(");
         for (String str : strings) {
             concatenatedString.append(str);
@@ -314,29 +286,28 @@ class DatabaseSourceTest {
         return results;
     }
 
-    // to prepare and fulfill test DB with test data initially
+//  to use when need to prepare and fulfill test DB with test data for the tests
     private static void prepareTestDb() throws SQLException {
         System.out.println("TEST: Preparing a test DB...");
         DatabaseSource tDbSource = new DatabaseSource();
         Connection tDbConnection = tDbSource.open(TEST_CONNECTION_STRING);
-//            testDbConnection.setAutoCommit(false);
         Statement prepareDbStatement = tDbConnection.createStatement();
         prepareDbStatement.execute("CREATE TABLE IF NOT EXISTS " + DatabaseSource.PRODUCTS_TABLE.getName()
-                + formStringForSql(DatabaseSource.PRODUCTS_TABLE.getColumnNames(), "TEXT", ", "));
+                + formStringForSql(DatabaseSource.PRODUCTS_TABLE.getColumnNames(), "TEXT"));
         prepareDbStatement.execute("CREATE TABLE IF NOT EXISTS " + DatabaseSource.PRODUCT_STATS_TABLE.getName()
-                + formStringForSql(DatabaseSource.PRODUCT_STATS_TABLE.getColumnNames(), "TEXT", ", "));
+                + formStringForSql(DatabaseSource.PRODUCT_STATS_TABLE.getColumnNames(), "TEXT"));
 
         for (String[] product : TEST_PRODUCTS) {
             prepareDbStatement.execute("INSERT INTO " + DatabaseSource.PRODUCTS_TABLE.getName()
-                    + " " + formStringForSql(DatabaseSource.PRODUCTS_TABLE.getColumnNames(), "", ", ")
-                    + " VALUES" + formStringForSql(product, "", ", "));
+                    + " " + formStringForSql(DatabaseSource.PRODUCTS_TABLE.getColumnNames(), "")
+                    + " VALUES" + formStringForSql(product, ""));
         }
 
         for (String[][] productDataRecords : TEST_PRODUCT_DATA_MATRIX) {
             for (String[] productData : productDataRecords) {
                 prepareDbStatement.execute("INSERT INTO " + DatabaseSource.PRODUCT_STATS_TABLE.getName()
-                        + " " + formStringForSql(DatabaseSource.PRODUCT_STATS_TABLE.getColumnNames(), "", ", ")
-                        + " VALUES" + formStringForSql(productData, "", ", "));
+                        + " " + formStringForSql(DatabaseSource.PRODUCT_STATS_TABLE.getColumnNames(), "")
+                        + " VALUES" + formStringForSql(productData, ""));
             }
         }
         tDbConnection.close();

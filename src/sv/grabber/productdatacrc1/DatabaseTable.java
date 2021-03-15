@@ -8,16 +8,16 @@ public class DatabaseTable {
     private String name;
     private String[] columnNames;
 
-    public DatabaseTable(String name, String[] columnNames) {
+    DatabaseTable(String name, String[] columnNames) {
         this.name = name;
         this.columnNames = columnNames;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public String[] getColumnNames() {
+    String[] getColumnNames() {
         return columnNames;
     }
 }

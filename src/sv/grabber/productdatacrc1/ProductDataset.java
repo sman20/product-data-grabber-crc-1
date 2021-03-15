@@ -3,7 +3,7 @@ package sv.grabber.productdatacrc1;
 import java.util.Arrays;
 
 /**
- * Implementation of product data set to store product configuration for search.
+ * Implementation of product data set to store product search configuration.
  */
 public class ProductDataset {
     private String name;
@@ -12,7 +12,7 @@ public class ProductDataset {
     private String[] parNames;
     private String[] sizes;
 
-    public ProductDataset(String name, String keyPar, String link, String[] sizes, String[] parNames) {
+    ProductDataset(String name, String keyPar, String link, String[] sizes, String[] parNames) {
         this.name = name;
         this.keyPar = keyPar;
         this.link = link;
@@ -25,19 +25,19 @@ public class ProductDataset {
         return name + "|" + keyPar + "|" + link + "|" + Arrays.toString(parNames) + "|" + Arrays.toString(sizes);
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public String getLink() {
+    String getLink() {
         return link;
     }
 
-    public String[] getParNames() {
+    String[] getParNames() {
         return parNames;
     }
 
-    public String[] getSizes() {
+    String[] getSizes() {
         return sizes;
     }
 }
