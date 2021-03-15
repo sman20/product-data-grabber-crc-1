@@ -58,14 +58,13 @@ First release of Product Data Grabber Crc1.
  </p>
  
  <h3>Usage</h3>
- <br>
  <ol>
  <li>Update configuration files with the info that corresponding to your needs:
      <ul style="list-style-type: circle;">
-        <li>Products data - <code>[data/crc_links.cfg]</code> files - with products you are interested in <i>(most likely required)</i></li>
-        <li>Product sizes to search for - <code>[data/crc_sizes.cfg]</code> files - with product sizes you are interested in <i>(most likely required)</i></li>
-        <li>Product parameters - <code>[data/crc_pars.cfg]</code> files - with product parameters you are interested in <i>(most likely NOT required)</i></li>
-        <li>Product common parameters - <code>[data/crc_search.cfg]</code> files - with common parameters you are interested in <i>(most likely NOT required)</i></li>
+        <li>Products data - <code>[data/crc_links.cfg]</code> - with products you are interested in <i>(most likely required)</i></li>
+        <li>Product sizes to search for - <code>[data/crc_sizes.cfg]</code> - with product sizes you are interested in <i>(most likely required)</i></li>
+        <li>Product parameters - <code>[data/crc_pars.cfg]</code> - with product parameters you are interested in <i>(most likely NOT required)</i></li>
+        <li>Product common parameters - <code>[data/crc_search.cfg]</code> - with common parameters you are interested in <i>(most likely NOT required)</i></li>
     </ul>
  </li>
  <li>Run the app on a machine connected to the Internet and choose options you want from the menu (see the list on the top).</li>
