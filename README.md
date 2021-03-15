@@ -4,7 +4,7 @@ First release of Product Data Grabber Crc1.
  The Product Data Grabber retrieves actual data (size, price, discount, availability, color, etc) for a particular set
  of product variations from CRC product pages, shows the results and stores them to different targets, like SQLite database, csv files.
  <br>Core public access point to the functionality.<br>
- The grabber has got an interactive command-line menu through which it is possible to :
+ <p>The grabber has got an interactive command-line menu through which it is possible to :</p>
  <ul>
     <li>parse list of CRC product pages for product variations with the required sizes and retrieve
     certain product variation with parameters and their values</li>
@@ -44,12 +44,15 @@ First release of Product Data Grabber Crc1.
  </p>
  
  <h3>Structure</h3>
+ <p>
  <b>Databases</b><br>
  Located in <code>[db]</code> folder, <code>[crc.db]</code> and <code>[test.db]</code> database files for production and test purposes respectively.
- <p>
+ </p>
+<p>
  <b>Output</b><br>
  Created csv files stored in <code>[output]</code> folder.
  </p>
+ <p>
   <b>Test</b><br>
  Some classes have JUnit test suites. The <code>[test]</code> folder is required for some tests.
  </p>
