@@ -42,6 +42,31 @@ First release of Product Data Grabber Crc1.
  Located in <code>[data]</code> folder, <code>[crc_search.*]</code> files that contain
  CSS or jQuery-like selectors to look for common product parameters on the pages.
  </p>
+ 
+ <h3>Structure</h3>
+ <b>Databases</b><br>
+ Located in <code>[db]</code> folder, <code>[crc.db]</code> and <code>[test.db]</code> database files for production and test purposes respectively.
+ <p>
+ <b>Output</b><br>
+ Created csv files stored in <code>[output]</code> folder.
+ </p>
+  <b>Test</b><br>
+ Some classes have JUnit test suites. The <code>[test]</code> folder is required for some tests.
+ </p>
+ 
+ <h3>Usage</h3>
+ <br>
+ <ol>
+ <li>Update configuration files with the info that corresponding to your needs:
+     <ul style="list-style-type: circle;">
+        <li>Products data - <code>[data/crc_links.cfg]</code> files - with products you are interested in <i>(most likely required)</i></li>
+        <li>Product sizes to search for - <code>[data/crc_sizes.cfg]</code> files - with product sizes you are interested in <i>(most likely required)</i></li>
+        <li>Product parameters - <code>[data/crc_pars.cfg]</code> files - with product parameters you are interested in <i>(most likely NOT required)</i></li>
+        <li>Product common parameters - <code>[data/crc_search.cfg]</code> files - with common parameters you are interested in <i>(most likely NOT required)</i></li>
+    </ul>
+ </li>
+ <li>Run the app on a machine connected to the Internet and choose options you want from the menu (see the list on the top).</li>
+ </ol>
  <p>
  @author S.V.
  @version 1.1.0
