@@ -14,7 +14,7 @@ First release of Product Data Grabber Crc1.
     <li>read/write configuration data from/to the text <code>[data/crc_*.cfg]</code> and binary <code>[data/crc_*.dat]</code> files</li>
     <li>performs exception handling for an incorrect input and missing data</li>
     <li>query the database and print out :
-    <ul style="list-style-type: circle;">
+    <ul style="list-style-type: square;">
         <li>all collected data for all the products</li>
         <li>last changed data for each product</li>
         <li>last changed data for each product that changed since last time</li>
