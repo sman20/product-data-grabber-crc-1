@@ -25,16 +25,15 @@ import java.util.List;
     <li>store results in the DB</li>
     <li>read/write configuration data from/to the text <code>[data/crc_*.cfg]</code> and binary <code>[data/crc_*.dat]</code> files</li>
     <li>performs exception handling for an incorrect input and missing data</li>
-    <li>query the database and print out :</li>
- <li style="list-style-type: none;">
-    <ul style="list-style-type: circle;">
-        <li>all collected data for all the products</li>
-        <li>last changed data for each product</li>
-        <li>last changed data for each product that changed since last time</li>
-        <li>all collected data for a particular product with given SKU ID</li>
-        <li>all collected data for particular products with the name that contains given word(s)</li>
-    </ul>
- </li>
+    <li>query the database and print out :
+        <ul style="list-style-type: circle;">
+            <li>all collected data for all the products</li>
+            <li>last changed data for each product</li>
+            <li>last changed data for each product that changed since last time</li>
+            <li>all collected data for a particular product with given SKU ID</li>
+            <li>all collected data for particular products with the name that contains given word(s)</li>
+        </ul>
+    </li>
  </ul>
  <h3>Configuration files</h3>
  <b>Products data</b><br>
@@ -63,9 +62,11 @@ import java.util.List;
  <br><i>Format:</i> <code>par_name, par_node, par_child_node</code>
  <br><i>Example:</i> <code>SIZES, ul.crcPDPList, li:contains(Size)</code>.
  </p>
+ <p>
  @author S.V.
  @version 1.1.0
  @since 2021-03-14
+ </p>
  */
 public class ProductDataGrabber {
     private String version = "1.1.0";
